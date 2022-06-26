@@ -1,66 +1,78 @@
+
+    ############
+    # PACKAGES #
+    ############
+
+# Tkinter
 import tkinter
 from tkinter import ttk
 
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
+# Matplotlib
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
+# Numpy
 import numpy as np
 
 
-# Création de la fenêtre
+
+    ###############
+    # SUBROUTINES #
+    ###############
+
+# Subroutine to close the window
+def _quit() :
+    
+    # Stops mainloop
+    root.quit() 
+
+    # Prevent fatal Python Error: PyEval_RestoreThread: NULL tstate              
+    root.destroy() 
+         
+        
+
+    ################
+    # MAIN PROGRAM #
+    ################
+
+# Creation of the window
 root = tkinter.Tk()
 root.wm_title("Embedding in Tk")
 
-# Création du notebook
+# Creation of the notebook
 my_notebook = ttk.Notebook(root)
 my_notebook.pack()
 
-# Création des frames
+# Creation of the frames
 frame1 = tkinter.LabelFrame(root, padx=5, pady=5, width=500, height=500)
 frame1.pack()
 frame2 = tkinter.LabelFrame(root, padx=5, pady=5, width=500, height=500)
 frame2.pack()
+# You can add more if you want
 
-# Implémentation des frames dans le notebook
-my_notebook.add(frame1, text="blue tab")
-my_notebook.add(frame2, text="red tab")
+# Implementation of the frames in the notebook
+my_notebook.add(frame1, text="first tab")
+my_notebook.add(frame2, text="second tab")
 
-# Création de la figure
+# Creation of the window close button
+button = tkinter.Button(master=root, text="Quit", command=_quit)
+button.pack(side=tkinter.BOTTOM)
+
+# Creation of the matplotlib figure
 fig = Figure(figsize=(5, 4), dpi=100)
 t = np.arange(0, 3, .01)
 fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
 
-# Implémentation de la figure dans la fenêtre tkinter
+# Implementation of the figure in the Tkinter window
 canvas = FigureCanvasTkAgg(fig, master=frame1)  # A tk.DrawingArea.
 canvas.draw()
 canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
-# Implémentation de la toolbar de la figure
+# Implementation of the toolbar of the figure
 toolbar = NavigationToolbar2Tk(canvas, root)
 toolbar.update()
 canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
-
-def on_key_press(event):
-    print("you pressed {}".format(event.key))
-    key_press_handler(event, canvas, toolbar)
-
-
-canvas.mpl_connect("key_press_event", on_key_press)
-
-
-def _quit():
-    root.quit()     # stops mainloop
-    root.destroy()  # this is necessary on Windows to prevent
-                    # Fatal Python Error: PyEval_RestoreThread: NULL tstate
-
-
-button = tkinter.Button(master=root, text="Quit", command=_quit)
-button.pack(side=tkinter.BOTTOM)
-
+# Mainloop of the Tkinter window
 tkinter.mainloop()
-# If you put root.destroy() here, it will cause an error if the window is
-# closed with the window manager.
